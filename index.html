@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -72,15 +73,6 @@
         .btn-secondary:hover {
             background-color: #d1d5db;
         }
-        .btn-ai {
-            background-color: #6d28d9;
-            color: #fff;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            transition: background-color 0.3s;
-        }
-        .btn-ai:hover {
-            background-color: #5b21b6;
-        }
         .media-container {
             display: flex;
             gap: 1rem;
@@ -148,25 +140,6 @@
             letter-spacing: 0.2em;
             color: #6b7280;
             margin-top: 0.5rem;
-        }
-        .ai-analysis-box {
-            background-color: #f9fafb;
-            border: 1px solid #e5e7eb;
-            border-radius: 0.75rem;
-            padding: 1.5rem;
-            margin-top: 1.5rem;
-        }
-        .spinner {
-            border: 4px solid rgba(0, 0, 0, 0.1);
-            border-left-color: #4f46e5;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
@@ -292,10 +265,6 @@
                 <textarea id="suggestionDescription-${index}" name="suggestionDescription_${index}" class="form-textarea" rows="4"></textarea>
             </div>
             <div class="form-group">
-                <button type="button" id="aiAnalysisBtn-${index}" class="w-full btn btn-ai mt-2">✨ Get AI Analysis ✨</button>
-            </div>
-            <div id="analysisResult-${index}" class="ai-analysis-box hidden"></div>
-            <div class="form-group">
                 <label for="mediaUpload-${index}" class="form-label">Upload a picture, video, or a reference</label>
                 <input type="file" id="mediaUpload-${index}" name="mediaUpload_${index}" class="form-input" accept="image/*,video/*" multiple>
             </div>
@@ -315,10 +284,6 @@
                 <textarea id="complaintDescription-${index}" name="complaintDescription_${index}" class="form-textarea" rows="4"></textarea>
             </div>
             <div class="form-group">
-                <button type="button" id="aiAnalysisBtn-${index}" class="w-full btn btn-ai mt-2">✨ Get AI Analysis ✨</button>
-            </div>
-            <div id="analysisResult-${index}" class="ai-analysis-box hidden"></div>
-            <div class="form-group">
                 <label for="mediaUpload-${index}" class="form-label">Upload a picture or video</label>
                 <input type="file" id="mediaUpload-${index}" name="mediaUpload_${index}" class="form-input" accept="image/*,video/*" multiple>
             </div>
@@ -334,7 +299,6 @@
         suggestionFormsContainer.appendChild(newForm);
         suggestionsData.push({ media: [] });
         attachMediaListeners(index, 'suggestion');
-        attachAiAnalysisListener(index, 'suggestion');
     }
 
     // Add a new complaint form to the page
@@ -344,99 +308,6 @@
         complaintFormsContainer.appendChild(newForm);
         complaintsData.push({ media: [] });
         attachMediaListeners(index, 'complaint');
-        attachAiAnalysisListener(index, 'complaint');
-    }
-
-    // Attach event listeners for AI analysis button
-    function attachAiAnalysisListener(index, type) {
-        const aiAnalysisBtn = document.getElementById(`aiAnalysisBtn-${index}`);
-        const descriptionField = document.getElementById(`${type}Description-${index}`);
-        const analysisResultDiv = document.getElementById(`analysisResult-${index}`);
-
-        aiAnalysisBtn.addEventListener('click', async () => {
-            const description = descriptionField.value;
-            if (!description.trim()) {
-                showMessageBox("Please enter a description before running AI analysis.");
-                return;
-            }
-
-            aiAnalysisBtn.disabled = true;
-            aiAnalysisBtn.innerHTML = '<div class="spinner mx-auto"></div>';
-            analysisResultDiv.innerHTML = '';
-            analysisResultDiv.classList.remove('hidden');
-
-            try {
-                const response = await analyzeFeedback(description, type);
-                analysisResultDiv.innerHTML = `
-                    <h3 class="font-bold text-gray-800 mb-2">AI Summary:</h3>
-                    <p class="text-gray-700 mb-4">${response.summary}</p>
-                    <h3 class="font-bold text-gray-800 mb-2">Suggested Response:</h3>
-                    <p class="text-gray-700">${response.suggestedResponse}</p>
-                `;
-            } catch (error) {
-                console.error('AI analysis failed:', error);
-                analysisResultDiv.innerHTML = `<p class="text-red-500">Analysis failed. Please try again later.</p>`;
-            } finally {
-                aiAnalysisBtn.disabled = false;
-                aiAnalysisBtn.innerHTML = '✨ Get AI Analysis ✨';
-            }
-        });
-    }
-
-    async function analyzeFeedback(description, type) {
-        const prompt = `Act as a customer service expert for a fashion brand. You have received the following ${type} from a customer.
-        The feedback is: "${description}"
-        Your task is to provide a concise summary of the feedback and a professional, empathetic, and helpful suggested response for the customer.
-        Provide the output in a JSON object with two fields: "summary" and "suggestedResponse".`;
-        
-        const payload = {
-            contents: [{ parts: [{ text: prompt }] }],
-            generationConfig: {
-                responseMimeType: "application/json",
-                responseSchema: {
-                    type: "OBJECT",
-                    properties: {
-                        "summary": { "type": "STRING" },
-                        "suggestedResponse": { "type": "STRING" }
-                    },
-                    "propertyOrdering": ["summary", "suggestedResponse"]
-                }
-            }
-        };
-
-        const apiKey = "";
-        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
-
-        let retries = 3;
-        while (retries > 0) {
-            try {
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                if (!response.ok) {
-                    throw new Error(`API error: ${response.status}`);
-                }
-
-                const result = await response.json();
-                if (result.candidates && result.candidates.length > 0) {
-                    const jsonString = result.candidates[0].content.parts[0].text;
-                    return JSON.parse(jsonString);
-                } else {
-                    throw new Error("Invalid API response format.");
-                }
-
-            } catch (error) {
-                console.error(`Attempt failed: ${error}`);
-                retries--;
-                if (retries > 0) {
-                    await new Promise(res => setTimeout(res, 2000));
-                }
-            }
-        }
-        throw new Error("Failed to get response after multiple retries.");
     }
 
     // Attach event listeners for media uploads and removals
@@ -500,12 +371,7 @@
     // Handle form submission
     feedbackForm.addEventListener('submit', async (event) => {
         event.preventDefault();
-
-        if (GOOGLE_APPS_SCRIPT_URL === "https://script.google.com/macros/s/AKfycbyP5gk6OU19Oqtvdp7vQ2TrcdZrqeKA_tevEzO3kID2O3YXt-ECxnwTDSpiVTKpEpxi/exec") {
-            showMessageBox("Error: Please set up the Google Apps Script and update the URL in the code.");
-            return;
-        }
-
+        
         const formData = new FormData(feedbackForm);
         const data = {
             partyName: formData.get('partyName'),
