@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fashion Brand Feedback Form</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(to bottom right, #f0eafb, #f3f4f6);
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 3rem;
+            background-color: #fff;
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        @media (max-width: 768px) {
+            .container {
+                margin: 1rem;
+                padding: 1.5rem;
+            }
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-label {
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+        .form-input, .form-textarea, .form-select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.75rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .form-input:focus, .form-textarea:focus, .form-select:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+        }
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .btn-primary {
+            background-color: #4f46e5;
+            color: #fff;
+        }
+        .btn-primary:hover {
+            background-color: #4338ca;
+        }
+        .btn-secondary {
+            background-color: #e5e7eb;
+            color: #1f2937;
+        }
+        .btn-secondary:hover {
+            background-color: #d1d5db;
+        }
+        .btn-ai {
+            background-color: #6d28d9;
+            color: #fff;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: background-color 0.3s;
+        }
+        .btn-ai:hover {
+            background-color: #5b21b6;
+        }
+        .media-container {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+        .media-item {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+        .media-item img, .media-item video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .remove-media {
+            position: absolute;
+            top: 0.25rem;
+            right: 0.25rem;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #ef4444;
+        }
+        .message-box {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #fff;
+            padding: 2.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 1.5rem;
+            max-width: 400px;
+        }
+        .logo-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .logo-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1f2937;
+            line-height: 1;
+        }
+        .logo-subtext {
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: #6b7280;
+            margin-top: 0.5rem;
+        }
+        .ai-analysis-box {
+            background-color: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #4f46e5;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="logo-header flex flex-col items-center">
+        <p class="logo-text">Martin Smith</p>
+        <p class="logo-subtext">Your Own Fashion Brand</p>
+        <h1 class="text-3xl font-bold text-center text-gray-800 mt-4">Let's Upgrade</h1>
+        <p class="text-center text-gray-600 mt-2">We value your input. Please let us know your suggestions or complaints.</p>
+    </div>
+
+    <form id="feedbackForm">
+        <div class="form-group">
+            <label for="partyName" class="form-label">Party Name</label>
+            <input type="text" id="partyName" name="partyName" class="form-input" placeholder="Enter party name" required>
+        </div>
+
+        <div class="form-group">
+            <label for="feedbackType" class="form-label">Is this a complaint or a suggestion?</label>
+            <select id="feedbackType" name="feedbackType" class="form-select" onchange="toggleFormSection()" required>
+                <option value="">Please select...</option>
+                <option value="suggestion">Suggestion</option>
+                <option value="complaint">Complaint</option>
+            </select>
+        </div>
+
+        <div id="suggestionSection" class="hidden">
+            <div id="suggestionForms"></div>
+            <button type="button" id="addSuggestionBtn" class="w-full btn btn-secondary mt-4">Add another suggestion</button>
+        </div>
+
+        <div id="complaintSection" class="hidden">
+            <div id="complaintForms"></div>
+            <button type="button" id="addComplaintBtn" class="w-full btn btn-secondary mt-4">Add another complaint</button>
+        </div>
+
+        <button type="submit" id="submitBtn" class="w-full btn btn-primary mt-6 hidden">Submit Feedback</button>
+    </form>
+</div>
+
+<div id="messageBox" class="message-box">
+    <div id="messageText" class="text-lg font-semibold text-gray-800"></div>
+    <button id="closeMessageBox" class="btn btn-primary">OK</button>
+</div>
+
+<script>
+    const GOOGLE_APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyP5gk6OU19Oqtvdp7vQ2TrcdZrqeKA_tevEzO3kID2O3YXt-ECxnwTDSpiVTKpEpxi/exec";
+    
+    const feedbackTypeSelect = document.getElementById('feedbackType');
+    const suggestionSection = document.getElementById('suggestionSection');
+    const complaintSection = document.getElementById('complaintSection');
+    const addSuggestionBtn = document.getElementById('addSuggestionBtn');
+    const addComplaintBtn = document.getElementById('addComplaintBtn');
+    const submitBtn = document.getElementById('submitBtn');
+    const feedbackForm = document.getElementById('feedbackForm');
+
+    const suggestionFormsContainer = document.getElementById('suggestionForms');
+    const complaintFormsContainer = document.getElementById('complaintForms');
+    const messageBox = document.getElementById('messageBox');
+    const messageText = document.getElementById('messageText');
+    const closeMessageBox = document.getElementById('closeMessageBox');
+
+    let suggestionsData = [];
+    let complaintsData = [];
+
+    // Helper to show a custom message box instead of alert()
+    function showMessageBox(message) {
+        messageText.innerHTML = message;
+        messageBox.style.display = 'flex';
+    }
+
+    // Helper to hide the custom message box
+    closeMessageBox.addEventListener('click', () => {
+        messageBox.style.display = 'none';
+        feedbackForm.reset();
+        toggleFormSection(); 
+    });
+
+    // Handle form visibility based on user selection
+    function toggleFormSection() {
+        const value = feedbackTypeSelect.value;
+        suggestionSection.classList.add('hidden');
+        complaintSection.classList.add('hidden');
+        submitBtn.classList.add('hidden');
+        suggestionsData = [];
+        complaintsData = [];
+        suggestionFormsContainer.innerHTML = '';
+        complaintFormsContainer.innerHTML = '';
+
+        if (value === 'suggestion') {
+            suggestionSection.classList.remove('hidden');
+            submitBtn.classList.remove('hidden');
+            addSuggestionForm();
+        } else if (value === 'complaint') {
+            complaintSection.classList.remove('hidden');
+            submitBtn.classList.remove('hidden');
+            addComplaintForm();
+        }
+    }
+
+    // Create a new suggestion form
+    function createSuggestionForm(index) {
+        const formDiv = document.createElement('div');
+        formDiv.classList.add('p-6', 'rounded-lg', 'border', 'border-gray-200', 'mb-4');
+        formDiv.innerHTML = `
+            <h2 class="text-xl font-bold text-gray-700 mb-4">Suggestion #${index + 1}</h2>
+            <div class="form-group">
+                <label class="form-label">Suggestion Type</label>
+                <select id="suggestionType-${index}" name="suggestionType_${index}" class="form-select">
+                    <option value="" selected disabled>Choose your suggestion type</option>
+                    <option value="fitting_suggestion">Fitting Suggestion</option>
+                    <option value="style_suggestion">Style Suggestion</option>
+                    <option value="customer_care_related_suggestion">Customer Care Related Suggestion</option>
+                    <option value="marketing_social_media_suggestion">Marketing/Social Media Suggestion</option>
+                    <option value="style_repeat_suggestion">Style Repeat Suggestion</option>
+                    <option value="other_suggestions">Other Suggestions</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="suggestionDescription-${index}" class="form-label">Describe your suggestion</label>
+                <textarea id="suggestionDescription-${index}" name="suggestionDescription_${index}" class="form-textarea" rows="4"></textarea>
+            </div>
+            <div class="form-group">
+                <button type="button" id="aiAnalysisBtn-${index}" class="w-full btn btn-ai mt-2">✨ Get AI Analysis ✨</button>
+            </div>
+            <div id="analysisResult-${index}" class="ai-analysis-box hidden"></div>
+            <div class="form-group">
+                <label for="mediaUpload-${index}" class="form-label">Upload a picture, video, or a reference</label>
+                <input type="file" id="mediaUpload-${index}" name="mediaUpload_${index}" class="form-input" accept="image/*,video/*" multiple>
+            </div>
+            <div class="media-container" id="mediaContainer-${index}"></div>
+        `;
+        return formDiv;
+    }
+
+    // Create a new complaint form
+    function createComplaintForm(index) {
+        const formDiv = document.createElement('div');
+        formDiv.classList.add('p-6', 'rounded-lg', 'border', 'border-gray-200', 'mb-4');
+        formDiv.innerHTML = `
+            <h2 class="text-xl font-bold text-gray-700 mb-4">Complaint #${index + 1}</h2>
+            <div class="form-group">
+                <label for="complaintDescription-${index}" class="form-label">Describe your complaint</label>
+                <textarea id="complaintDescription-${index}" name="complaintDescription_${index}" class="form-textarea" rows="4"></textarea>
+            </div>
+            <div class="form-group">
+                <button type="button" id="aiAnalysisBtn-${index}" class="w-full btn btn-ai mt-2">✨ Get AI Analysis ✨</button>
+            </div>
+            <div id="analysisResult-${index}" class="ai-analysis-box hidden"></div>
+            <div class="form-group">
+                <label for="mediaUpload-${index}" class="form-label">Upload a picture or video</label>
+                <input type="file" id="mediaUpload-${index}" name="mediaUpload_${index}" class="form-input" accept="image/*,video/*" multiple>
+            </div>
+            <div class="media-container" id="mediaContainer-${index}"></div>
+        `;
+        return formDiv;
+    }
+
+    // Add a new suggestion form to the page
+    function addSuggestionForm() {
+        const index = suggestionsData.length;
+        const newForm = createSuggestionForm(index);
+        suggestionFormsContainer.appendChild(newForm);
+        suggestionsData.push({ media: [] });
+        attachMediaListeners(index, 'suggestion');
+        attachAiAnalysisListener(index, 'suggestion');
+    }
+
+    // Add a new complaint form to the page
+    function addComplaintForm() {
+        const index = complaintsData.length;
+        const newForm = createComplaintForm(index);
+        complaintFormsContainer.appendChild(newForm);
+        complaintsData.push({ media: [] });
+        attachMediaListeners(index, 'complaint');
+        attachAiAnalysisListener(index, 'complaint');
+    }
+
+    // Attach event listeners for AI analysis button
+    function attachAiAnalysisListener(index, type) {
+        const aiAnalysisBtn = document.getElementById(`aiAnalysisBtn-${index}`);
+        const descriptionField = document.getElementById(`${type}Description-${index}`);
+        const analysisResultDiv = document.getElementById(`analysisResult-${index}`);
+
+        aiAnalysisBtn.addEventListener('click', async () => {
+            const description = descriptionField.value;
+            if (!description.trim()) {
+                showMessageBox("Please enter a description before running AI analysis.");
+                return;
+            }
+
+            aiAnalysisBtn.disabled = true;
+            aiAnalysisBtn.innerHTML = '<div class="spinner mx-auto"></div>';
+            analysisResultDiv.innerHTML = '';
+            analysisResultDiv.classList.remove('hidden');
+
+            try {
+                const response = await analyzeFeedback(description, type);
+                analysisResultDiv.innerHTML = `
+                    <h3 class="font-bold text-gray-800 mb-2">AI Summary:</h3>
+                    <p class="text-gray-700 mb-4">${response.summary}</p>
+                    <h3 class="font-bold text-gray-800 mb-2">Suggested Response:</h3>
+                    <p class="text-gray-700">${response.suggestedResponse}</p>
+                `;
+            } catch (error) {
+                console.error('AI analysis failed:', error);
+                analysisResultDiv.innerHTML = `<p class="text-red-500">Analysis failed. Please try again later.</p>`;
+            } finally {
+                aiAnalysisBtn.disabled = false;
+                aiAnalysisBtn.innerHTML = '✨ Get AI Analysis ✨';
+            }
+        });
+    }
+
+    async function analyzeFeedback(description, type) {
+        const prompt = `Act as a customer service expert for a fashion brand. You have received the following ${type} from a customer.
+        The feedback is: "${description}"
+        Your task is to provide a concise summary of the feedback and a professional, empathetic, and helpful suggested response for the customer.
+        Provide the output in a JSON object with two fields: "summary" and "suggestedResponse".`;
+        
+        const payload = {
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: {
+                responseMimeType: "application/json",
+                responseSchema: {
+                    type: "OBJECT",
+                    properties: {
+                        "summary": { "type": "STRING" },
+                        "suggestedResponse": { "type": "STRING" }
+                    },
+                    "propertyOrdering": ["summary", "suggestedResponse"]
+                }
+            }
+        };
+
+        const apiKey = "";
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
+        let retries = 3;
+        while (retries > 0) {
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API error: ${response.status}`);
+                }
+
+                const result = await response.json();
+                if (result.candidates && result.candidates.length > 0) {
+                    const jsonString = result.candidates[0].content.parts[0].text;
+                    return JSON.parse(jsonString);
+                } else {
+                    throw new Error("Invalid API response format.");
+                }
+
+            } catch (error) {
+                console.error(`Attempt failed: ${error}`);
+                retries--;
+                if (retries > 0) {
+                    await new Promise(res => setTimeout(res, 2000));
+                }
+            }
+        }
+        throw new Error("Failed to get response after multiple retries.");
+    }
+
+    // Attach event listeners for media uploads and removals
+    function attachMediaListeners(index, type) {
+        const uploadInput = document.getElementById(`mediaUpload-${index}`);
+        const mediaContainer = document.getElementById(`mediaContainer-${index}`);
+        
+        uploadInput.addEventListener('change', (event) => {
+            const files = Array.from(event.target.files);
+            files.forEach(file => {
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const mediaItem = document.createElement('div');
+                        mediaItem.classList.add('media-item');
+                        
+                        let mediaElement;
+                        if (file.type.startsWith('image/')) {
+                            mediaElement = document.createElement('img');
+                            mediaElement.src = e.target.result;
+                        } else if (file.type.startsWith('video/')) {
+                            mediaElement = document.createElement('video');
+                            mediaElement.src = e.target.result;
+                            mediaElement.controls = true;
+                        }
+
+                        if (mediaElement) {
+                            const removeBtn = document.createElement('span');
+                            removeBtn.classList.add('remove-media');
+                            removeBtn.innerHTML = '&#x2715;';
+                            removeBtn.addEventListener('click', () => {
+                                mediaItem.remove();
+                                if (type === 'suggestion') {
+                                    suggestionsData[index].media = suggestionsData[index].media.filter(m => m.url !== e.target.result);
+                                } else {
+                                    complaintsData[index].media = complaintsData[index].media.filter(m => m.url !== e.target.result);
+                                }
+                            });
+
+                            mediaItem.appendChild(mediaElement);
+                            mediaItem.appendChild(removeBtn);
+                            mediaContainer.appendChild(mediaItem);
+
+                            if (type === 'suggestion') {
+                                suggestionsData[index].media.push({ type: file.type, url: e.target.result, name: file.name });
+                            } else {
+                                complaintsData[index].media.push({ type: file.type, url: e.target.result, name: file.name });
+                            }
+                        }
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        });
+    }
+
+    // Event listeners for adding more forms
+    addSuggestionBtn.addEventListener('click', () => addSuggestionForm());
+    addComplaintBtn.addEventListener('click', () => addComplaintForm());
+
+    // Handle form submission
+    feedbackForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        if (GOOGLE_APPS_SCRIPT_URL === "https://script.google.com/macros/s/AKfycbyP5gk6OU19Oqtvdp7vQ2TrcdZrqeKA_tevEzO3kID2O3YXt-ECxnwTDSpiVTKpEpxi/exec") {
+            showMessageBox("Error: Please set up the Google Apps Script and update the URL in the code.");
+            return;
+        }
+
+        const formData = new FormData(feedbackForm);
+        const data = {
+            partyName: formData.get('partyName'),
+            feedbackType: formData.get('feedbackType'),
+            entries: []
+        };
+        
+        const type = data.feedbackType;
+        const entryCount = type === 'suggestion' ? suggestionsData.length : complaintsData.length;
+
+        for (let i = 0; i < entryCount; i++) {
+            const entry = {};
+            entry.entryType = type;
+            if (type === 'suggestion') {
+                entry.suggestionType = formData.get(`suggestionType_${i}`);
+                entry.description = formData.get(`suggestionDescription_${i}`);
+                entry.media = suggestionsData[i].media.map(m => m.name).join('; ');
+            } else {
+                entry.suggestionType = 'N/A';
+                entry.description = formData.get(`complaintDescription_${i}`);
+                entry.media = complaintsData[i].media.map(m => m.name).join('; ');
+            }
+            data.entries.push(entry);
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Submitting...';
+
+        try {
+            const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors', // Required for Google Apps Script
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            });
+            
+            showMessageBox(`
+                <h2 class="text-xl font-bold text-gray-800 mb-2">You've Taken a Step Towards Success!</h2>
+                <p class="text-gray-700">Thank you for your valuable feedback.</p>
+                <p class="text-gray-700">We are waiting for your next order.</p>
+            `);
+            closeMessageBox.textContent = "Submit a new response";
+
+        } catch (error) {
+            console.error('Submission failed:', error);
+            showMessageBox("There was an error submitting your feedback. Please try again.");
+            closeMessageBox.textContent = "OK";
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Submit Feedback';
+        }
+    });
+
+    // Initial setup
+    toggleFormSection();
+</script>
+
+</body>
+</html>
